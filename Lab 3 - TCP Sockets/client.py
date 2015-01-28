@@ -14,13 +14,24 @@ print("Password : " + str(inputPW))
 print("Command  : " + str(command))
 print("Param    : " + str(param))
 
+port = 842
+size = 1042
 #Start
 sckt = socket.socket()
 sckt.connect((serverIP, port))
 #Try password
-sckt.send(inputPW)
-pwPass = sckt.recv();
-sckt.send(command, param)
+sckt.sendall(inputPW.encode())
+data = sckt.recv(size)
+data = data.decode()
+print("Data: " + data)
+if data != "True":
+	sckt.close()
+	print("Password invalid!")
+else:
+	print("Success!")
+	sckt.close()
+#pwPass = sckt.recv();
+#sckt.send(command, param)
 
 #def commandAction(command, param):
 #	return{
