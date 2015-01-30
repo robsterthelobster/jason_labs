@@ -10,7 +10,7 @@ if len(sys.argv) == 5:
 	param = sys.argv[4]
 
 port = 842
-size = 1042
+size = 1024
 #Start
 sckt = socket.socket()
 sckt.connect((serverIP, port))
@@ -26,7 +26,7 @@ else:
 		sckt.sendall(command.encode())
 		data = sckt.recv(size)
 		data = data.decode()
-		files = data.split()
+		files = data.split(", ")
 		for file in files:
 			print(file)
 

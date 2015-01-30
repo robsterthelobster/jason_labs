@@ -28,13 +28,18 @@ while True:
 		command = data.decode()
 		
 		if command == "list":
-			files = [f for f in os.listdir('./files') if os.path.isfile(f)]
+			path = os.getcwd() + "\\public"
+			files = os.listdir(path)
 			filenames = ""
-			filenames += str(files)[1:-1]
-			c.sendall(filenames.encode()) 
-
+			for i in range(len(files)):
+				if os.path.isfile(path+"\\"+str(files[i])):
+					filenames += str(files[i])
+					if i != len(files) - 1:
+						filenames += ", "
+			c.sendall(filenames.encode())
+				
 		elif command == "get":
-			data = c.recv(1024)
+			data = c.recv(size)
 			filename = data.decode()
 			try:
 				file = open(filename, "rb")
@@ -49,17 +54,17 @@ while True:
 				c.sendall("false".encode())
 				
 		elif command == "put":
-			data = c.recv(1024)
+			data = c.recv(size)
 			filename = data.decode()
 			with open(filename, 'wb') as file_to_write:
 				while True:
-					data = c.recv(1024)
+					data = c.recv(size)
 					if not data:
 						break
 					file_to_write.write(data)
 			
 		elif command == "delete":
-			data = c.recv(1024)
+			data = c.recv(size)
 			try:
 				os.remove(data.decode())
 				c.sendall("true".encode())
