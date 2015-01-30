@@ -33,30 +33,41 @@ else:
 	elif command == "get":
 		sckt.sendall(command.encode())
 		sckt.sendall(param.encode())
-		
-		with open(param, 'wb') as file_to_write:
-			while True:
-				data = sckt.recv(1024)
-				if not data:
-					break
-				file_to_write.write(data)
+		data = sckt.recv(1024)
+		if data.decode() == "true":
+			with open(param, 'wb') as file_to_write:
+				while True:
+					data = sckt.recv(1024)
+					print(data)
+					if not data:
+						break
+					file_to_write.write(data)
+		else:
+			print("File [" + param + "] does not exist")
 		
 	elif command == "put":
-		sckt.sendall(command.encode())
-		sckt.sendall(param.encode())
-		file = open(param, "rb")
-	
-		while True:
-			chunk = file.read(65536)
-			if not chunk:
-				break  # EOF
-			sckt.sendall(chunk)
+		try:
+			file = open(param, "rb")
+			sckt.sendall(command.encode())
+			sckt.sendall(param.encode())
+		
+			while True:
+				chunk = file.read(65536)
+				if not chunk:
+					break  # EOF
+				sckt.sendall(chunk)
+				
+		except FileNotFoundError:
+			print("File [" + param + "] does not exist")
 			
 	elif command == "delete":
 		sckt.sendall(command.encode())
 		sckt.sendall(param.encode())
+		data = sckt.recv(1024)
+		if data.decode() == "false":
+			print("File [" + param + "] does not exist")
 		
 	else:
-		print("Invalid command")
+		print(command + " is a invalid command")
 
 	sckt.close()

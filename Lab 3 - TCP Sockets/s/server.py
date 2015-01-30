@@ -25,25 +25,30 @@ while True:
 			c.sendall(pwGood.encode())
 	if pwGood == "True":
 		data = c.recv(size)
-		data = data.decode()
+		command = data.decode()
 		
-		if data == "list":
+		if command == "list":
 			files = [f for f in os.listdir('.') if os.path.isfile(f)]
 			filenames = ""
 			filenames += str(files)[1:-1]
 			c.sendall(filenames.encode()) 
 
-		elif data == "get":
+		elif command == "get":
 			data = c.recv(1024)
-			file = open(data.decode(), "rb")
-			
-			while True:
-				chunk = file.read(65536)
-				if not chunk:
-					break
-				c.sendall(chunk)
-			
-		elif data == "put":
+			filename = data.decode()
+			try:
+				file = open(filename, "rb")
+				c.sendall("true".encode())
+				while True:
+					chunk = file.read(65536)
+					print(chunk)
+					if not chunk:
+						break
+					c.sendall(chunk)
+			except FileNotFoundError:
+				c.sendall("false".encode())
+				
+		elif command == "put":
 			data = c.recv(1024)
 			filename = data.decode()
 			with open(filename, 'wb') as file_to_write:
@@ -53,10 +58,14 @@ while True:
 						break
 					file_to_write.write(data)
 			
-		elif data == "delete":
+		elif command == "delete":
 			data = c.recv(1024)
-			os.remove(data.decode())
-			
+			try:
+				os.remove(data.decode())
+				c.sendall("true".encode())
+			except FileNotFoundError:
+				c.sendall("false".encode())
+				
 		else:
 			print("Invalid command")
 			
