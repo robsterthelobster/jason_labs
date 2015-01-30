@@ -28,20 +28,19 @@ while True:
 		command = data.decode()
 		
 		if command == "list":
-			files = [f for f in os.listdir('.') if os.path.isfile(f)]
+			files = [f for f in os.listdir('./files') if os.path.isfile(f)]
 			filenames = ""
 			filenames += str(files)[1:-1]
 			c.sendall(filenames.encode()) 
 
 		elif command == "get":
-			data = c.recv(size)
+			data = c.recv(1024)
 			filename = data.decode()
 			try:
 				file = open(filename, "rb")
 				c.sendall("true".encode())
 				while True:
 					chunk = file.read(65536)
-					print(chunk)
 					if not chunk:
 						c.sendall("end".encode())
 						break
@@ -50,29 +49,30 @@ while True:
 				c.sendall("false".encode())
 				
 		elif command == "put":
-			data = c.recv(size)
+			data = c.recv(1024)
 			filename = data.decode()
 			with open(filename, 'wb') as file_to_write:
 				while True:
-					data = c.recv(size)
+					data = c.recv(1024)
 					if not data:
 						break
 					file_to_write.write(data)
 			
 		elif command == "delete":
-			data = c.recv(size)
+			data = c.recv(1024)
 			try:
 				os.remove(data.decode())
 				c.sendall("true".encode())
 			except FileNotFoundError:
 				c.sendall("false".encode())
 				
+		elif command == "end":
+			break;
+		
 		else:
 			print("Invalid command")
 			
 	data = None
 	pwGood = None
-	
-#serv_sckt.shutdown(socket.SHUT_RDWR)
+
 serv_sckt.close()
-print("Done!")

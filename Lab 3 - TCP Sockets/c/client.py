@@ -10,7 +10,7 @@ if len(sys.argv) == 5:
 	param = sys.argv[4]
 
 port = 842
-size = 1024
+size = 1042
 #Start
 sckt = socket.socket()
 sckt.connect((serverIP, port))
@@ -38,8 +38,8 @@ else:
 			with open(param, 'wb') as file_to_write:
 				while True:
 					data = sckt.recv(size)
-					print(data)
-					if data.decode() == "end":
+					temp = data.decode()
+					if temp == "end":
 						break
 					file_to_write.write(data)
 		else:
@@ -66,6 +66,9 @@ else:
 		data = sckt.recv(size)
 		if data.decode() == "false":
 			print("File [" + param + "] does not exist")
+	
+	elif command == "end":
+		sckt.sendall(command.encode())
 		
 	else:
 		print(command + " is a invalid command")
