@@ -1,4 +1,5 @@
 import socket
+import os
 
 ip = ''
 port = 842
@@ -25,25 +26,26 @@ while True:
 			serv_sckt.close()
 	if pwGood == "True":
 		data = c.recv(size)
+		data = data.decode()
+		print(data)
+		
+		if data == "list":
+			files = [f for f in os.listdir('.') if os.path.isfile(f)]
+			filenames = ""
+			filenames += str(files)[1:-1]
+			c.sendall(filenames.encode()) 
+
+		elif data == "get":
+			print("get")
+		elif data == "put":
+			print("put")
+		elif data == "delete":
+			print("delete")
+		else:
+			print("Invalid command")
+			
 		break
 
 #serv_sckt.shutdown(socket.SHUT_RDWR)
 serv_sckt.close()
 print("Done!")
-
-def action(command, param):
-	return{
-		"list"   : list()
-		"get"    : get(param)
-		"put"    : put(param)
-		"delete" : delete(param)
-	}
-	
-def list():
-
-def get(param):
-
-def put(param):
-
-def delete(param):
-

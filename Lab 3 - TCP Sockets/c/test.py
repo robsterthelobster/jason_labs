@@ -14,11 +14,8 @@ sckt.connect((serverIP, port))
 sckt.sendall(command.encode())
 print("Sending...")
 data = sckt.recv(size)
-num = int(str(data.decode()))
-i = 0
-while i < num:
-	data = sckt.recv(size)
-	temp = str(data.decode())
-	print("File[" + str(i) + "]: " + temp)
-	i += 1
+data = data.decode()
+files = data.split()
+for file in files:
+	print(file)
 sckt.close()

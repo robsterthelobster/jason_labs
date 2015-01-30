@@ -29,27 +29,22 @@ if data != "True":
 	print("Password invalid!")
 else:
 	print("Success!")
-	commandAction(command, param):
+	print(command)
+	if command == "list":
+		sckt.sendall(command.encode())
+		data = sckt.recv(size)
+		data = data.decode()
+		files = data.split()
+		for file in files:
+			print(file)
+
+	elif command == "get":
+		print(command)
+	elif command == "put":
+		print(command)
+	elif command == "delete":
+		print(command)
+	else:
+		print("Invalid command")
+
 	sckt.close()
-
-def commandAction(command, param):
-	return{
-		"list"  : list()
-		"get"   : get(param)
-		"put"   : put(param)
-		"delete": delete(param)
-	}
-	
-def list():
-	global sckt
-	size = 1024
-	sckt.sendall(command.encode())
-	data = sckt.receive(size)
-	data = data.decode()
-	print("Files: " + data)
-
-def get(param):
-
-def put(param):
-
-def delete(param):

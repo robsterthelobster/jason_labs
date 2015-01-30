@@ -15,10 +15,9 @@ while True:
 	data = c.recv(size)
 	if data.decode() == "list":
 		files = [f for f in os.listdir('.') if os.path.isfile(f)]
-		c.sendall(str(len(files)).encode())
-		for f in files:
-			temp = open(f, 'r')
-			c.sendall((temp.name).encode())
+		filenames = ""
+		filenames += str(files)[1:-1]
+		c.sendall(filenames.encode())
 		break
 	else:
 		print("Not list")
