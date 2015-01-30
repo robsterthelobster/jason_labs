@@ -23,11 +23,9 @@ while True:
 		else:
 			pwGood = "False"
 			c.sendall(pwGood.encode())
-			serv_sckt.close()
 	if pwGood == "True":
 		data = c.recv(size)
 		data = data.decode()
-		print(data)
 		
 		if data == "list":
 			files = [f for f in os.listdir('.') if os.path.isfile(f)]
@@ -36,25 +34,35 @@ while True:
 			c.sendall(filenames.encode()) 
 
 		elif data == "get":
-			print("get")
+			data = c.recv(1024)
+			file = open(data.decode(), "rb")
+			
+			while True:
+				chunk = file.read(65536)
+				if not chunk:
+					break
+				c.sendall(chunk)
+			
 		elif data == "put":
-			print("put")
-		
-			with open('myTransfer.txt', 'wb') as file_to_write:
+			data = c.recv(1024)
+			filename = data.decode()
+			with open(filename, 'wb') as file_to_write:
 				while True:
 					data = c.recv(1024)
-					print data
 					if not data:
 						break
 					file_to_write.write(data)
 			
 		elif data == "delete":
-			print("delete")
+			data = c.recv(1024)
+			os.remove(data.decode())
+			
 		else:
 			print("Invalid command")
-		
-	break
-
+			
+	data = None
+	pwGood = None
+	
 #serv_sckt.shutdown(socket.SHUT_RDWR)
 serv_sckt.close()
 print("Done!")

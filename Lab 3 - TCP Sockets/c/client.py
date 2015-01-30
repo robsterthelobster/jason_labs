@@ -9,11 +9,6 @@ param    = "[None]"
 if len(sys.argv) == 5:
 	param = sys.argv[4]
 
-print("Server IP: " + str(serverIP))
-print("Password : " + str(inputPW))
-print("Command  : " + str(command))
-print("Param    : " + str(param))
-
 port = 842
 size = 1042
 #Start
@@ -23,13 +18,10 @@ sckt.connect((serverIP, port))
 sckt.sendall(inputPW.encode())
 data = sckt.recv(size)
 data = data.decode()
-print("Data: " + data)
 if data != "True":
 	sckt.close()
 	print("Password invalid!")
 else:
-	print("Success!")
-	print(command)
 	if command == "list":
 		sckt.sendall(command.encode())
 		data = sckt.recv(size)
@@ -39,10 +31,19 @@ else:
 			print(file)
 
 	elif command == "get":
-		print(command)
+		sckt.sendall(command.encode())
+		sckt.sendall(param.encode())
+		
+		with open(param, 'wb') as file_to_write:
+			while True:
+				data = sckt.recv(1024)
+				if not data:
+					break
+				file_to_write.write(data)
+		
 	elif command == "put":
-		print(command)
-		sckt.sendall(command)
+		sckt.sendall(command.encode())
+		sckt.sendall(param.encode())
 		file = open(param, "rb")
 	
 		while True:
@@ -50,8 +51,11 @@ else:
 			if not chunk:
 				break  # EOF
 			sckt.sendall(chunk)
+			
 	elif command == "delete":
-		print(command)
+		sckt.sendall(command.encode())
+		sckt.sendall(param.encode())
+		
 	else:
 		print("Invalid command")
 
