@@ -39,12 +39,21 @@ while True:
 			print("get")
 		elif data == "put":
 			print("put")
+		
+			with open('myTransfer.txt', 'wb') as file_to_write:
+				while True:
+					data = c.recv(1024)
+					print data
+					if not data:
+						break
+					file_to_write.write(data)
+			
 		elif data == "delete":
 			print("delete")
 		else:
 			print("Invalid command")
-			
-		break
+		
+	break
 
 #serv_sckt.shutdown(socket.SHUT_RDWR)
 serv_sckt.close()

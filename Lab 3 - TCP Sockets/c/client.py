@@ -42,6 +42,14 @@ else:
 		print(command)
 	elif command == "put":
 		print(command)
+		sckt.sendall(command)
+		file = open(param, "rb")
+	
+		while True:
+			chunk = file.read(65536)
+			if not chunk:
+				break  # EOF
+			sckt.sendall(chunk)
 	elif command == "delete":
 		print(command)
 	else:
