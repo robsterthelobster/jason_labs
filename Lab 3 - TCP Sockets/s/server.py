@@ -34,7 +34,7 @@ while True:
 			c.sendall(filenames.encode()) 
 
 		elif command == "get":
-			data = c.recv(1024)
+			data = c.recv(size)
 			filename = data.decode()
 			try:
 				file = open(filename, "rb")
@@ -43,23 +43,24 @@ while True:
 					chunk = file.read(65536)
 					print(chunk)
 					if not chunk:
+						c.sendall("end".encode())
 						break
 					c.sendall(chunk)
 			except FileNotFoundError:
 				c.sendall("false".encode())
 				
 		elif command == "put":
-			data = c.recv(1024)
+			data = c.recv(size)
 			filename = data.decode()
 			with open(filename, 'wb') as file_to_write:
 				while True:
-					data = c.recv(1024)
+					data = c.recv(size)
 					if not data:
 						break
 					file_to_write.write(data)
 			
 		elif command == "delete":
-			data = c.recv(1024)
+			data = c.recv(size)
 			try:
 				os.remove(data.decode())
 				c.sendall("true".encode())
