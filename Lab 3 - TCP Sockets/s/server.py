@@ -27,8 +27,8 @@ while True:
 		data = c.recv(size)
 		command = data.decode()
 		
+		path = os.getcwd() + "\\public"
 		if command == "list":
-			path = os.getcwd() + "\\public"
 			files = os.listdir(path)
 			filenames = ""
 			for i in range(len(files)):
@@ -42,7 +42,7 @@ while True:
 			data = c.recv(size)
 			filename = data.decode()
 			try:
-				file = open(filename, "rb")
+				file = open(path+"\\" + filename, "rb")
 				c.sendall("true".encode())
 				while True:
 					chunk = file.read(65536)
@@ -56,7 +56,7 @@ while True:
 		elif command == "put":
 			data = c.recv(size)
 			filename = data.decode()
-			with open(filename, 'wb') as file_to_write:
+			with open(path+"\\"+filename, 'wb') as file_to_write:
 				while True:
 					data = c.recv(size)
 					if not data:
@@ -66,7 +66,7 @@ while True:
 		elif command == "delete":
 			data = c.recv(size)
 			try:
-				os.remove(data.decode())
+				os.remove(path + "\\" + data.decode())
 				c.sendall("true".encode())
 			except FileNotFoundError:
 				c.sendall("false".encode())
