@@ -2,7 +2,7 @@ import socket
 import os
 
 ip = ''
-port = 80
+port = 8080
 size = 1024
 password = "meh"
 pwGood = None
@@ -22,10 +22,12 @@ while True:
 			c.sendall(pwGood.encode())
 		else:
 			pwGood = "False"
+			print(str(a[0]) + " failed to connect.")
 			c.sendall(pwGood.encode())
 	if pwGood == "True":
 		data = c.recv(size)
 		command = data.decode()
+		print(str(a[0]) + " " + command)
 		
 		path = os.getcwd() + "\\public"
 		if command == "list":
@@ -81,5 +83,5 @@ while True:
 	c.close()
 	data = None
 	pwGood = None
-serv_sckt.shutdown(socket.SHUT_RDWR)
+#serv_sckt.shutdown(socket.SHUT_RDWR)
 serv_sckt.close()

@@ -9,7 +9,7 @@ param    = "[None]"
 if len(sys.argv) == 5:
 	param = sys.argv[4]
 
-port = 80
+port = 8080
 size = 1024
 #Start
 sckt = socket.socket()
