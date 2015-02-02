@@ -2,7 +2,7 @@ import socket
 import os
 
 ip = ''
-port = 842
+port = 80
 size = 1024
 password = "meh"
 pwGood = None
@@ -46,10 +46,11 @@ while True:
 				c.sendall("true".encode())
 				while True:
 					chunk = file.read(65536)
+					#print("Server: " + str(chunk))
 					if not chunk:
-						c.sendall("end".encode())
 						break
 					c.sendall(chunk)
+				file.close()
 			except FileNotFoundError:
 				c.sendall("false".encode())
 				
@@ -76,8 +77,9 @@ while True:
 		
 		else:
 			print("Invalid command")
-			
+	
+	c.close()
 	data = None
 	pwGood = None
-
+serv_sckt.shutdown(socket.SHUT_RDWR)
 serv_sckt.close()
