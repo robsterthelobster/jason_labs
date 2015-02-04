@@ -67,14 +67,13 @@ class Task implements Runnable{
 				end = filesize;
 			else
 				end = (this.myid+1)*sz;
-			System.out.println("myid["+this.myid+"] start["+start +"] end["+end+"]");
+			//System.out.println("size["+filesize+"] myid["+this.myid+"] start["+start +"] end["+end+"]");
 			raf.seek(start);
-			if(start != 0 )
+			if(start != 0 && Count.L.isFair())
 				raf.readLine();
 			while(raf.getFilePointer() < end){
 				try{
-					//if(Count.L.tryAcquire()){
-					Count.L.tryAcquire();
+					if(Count.L.tryAcquire()){
 						String s = raf.readLine();
 						Scanner sc = new Scanner(s);
 						while(sc.hasNext()){
@@ -84,7 +83,7 @@ class Task implements Runnable{
 								Count.count.incrementAndGet();
 							}
 						}
-					//}
+					}
 
 				} finally{
 					Count.L.release();
