@@ -9,6 +9,7 @@ public class Count{
     public static void main(String[] arg){
         Scanner in = new Scanner(System.in);
         String fname;
+       
         int numthreads;
         if( arg.length > 0 ){
             fname = arg[0];
@@ -55,7 +56,6 @@ class Task implements Runnable{
         this.totaltasks=totaltasks;
         this.raf=raf;
     }
-    @Override
     public void run(){
         try{
             long filesize = this.raf.length();
