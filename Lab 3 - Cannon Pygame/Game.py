@@ -4,9 +4,9 @@ import random
 import math
 
 class obj_Physics(object):
-	def __init__(self, x, y, vX, vY):
-		self.mPos = math3d.VectorN((x, y))
-		self.mVel = math3d.VectorN((vX, vY))
+	def __init__(self, pos, vel):
+		self.mPos = math3d.VectorN(pos)
+		self.mVel = math3d.VectorN(vel)
 		
 	def printPos(self):
 		print(self.mPos)
@@ -25,53 +25,62 @@ class obj_Physics(object):
 		self.mPos += self.mVel * dt
 
 class cannonBall(obj_Physics):
-	def __init__(self, x, y, vX, vY):
-		super().__init__(x, y, vX, vY)
+	def __init__(self, pos, vel):
+		super().__init__(pos,vel)
 		self.img = pygame.image.load("images/coconut.png").convert()
-		
-	def render(self, dt):
-		screen.blit(self.img, self.mPos.iTuple())
-
-	def destroy(self):
-		print("Destroy!")
-		pass
-		
+		self.gravity = math3d.VectorN((0,.05))
+		self.rotation = 0
+	
 	def update(self, dt):
 		super().update(dt)
-		d = 50
-		if self.mPos[0] < -d or self.mPos[0] > (width+d) or self.mPos[1] < -d or self.mPos[1] > (height+d):
-			self.destroy()
+		self.rotation += 5
+		self.mPos += self.gravity*dt
+	
+	def render(self, dt):
+		tmp = pygame.transform.rotate(self.img, self.rotation)
+		screen.blit(tmp, self.mPos.iTuple())
 			
 class cannon(obj_Physics):
 
-	projectiles = []
-
-	def __init__(self, x, y, vX, vY):
-		super().__init__(x, y, vX, vY)
+	def __init__(self,pos,vel):
+		super().__init__(pos,vel)
 		self.img = pygame.image.load("images/cannon.png")
+		self.barrelImg = pygame.image.load("images/barrell.png")
+		self.angle = 0
 		self.friction = math3d.VectorN((.1,0))
-		self.accelSpd = .01
+		self.accelSpd = .01	
+		self.projectiles = []
+		self.shootCD = .5
 	
 	def update(self, dt):
 		super().update(dt)
 		self.applyFriction()
 		
+		for ball in self.projectiles:
+			if ball.mPos[0] > width or ball.mPos[1] > height:
+				self.projectiles.remove(ball)
+		
 		eList = pygame.event.get()
 		for e in eList:
-			if e.type == pygame.mouse.get_pressed():
-				shoot()
+			if e.type == pygame.MOUSEBUTTONDOWN:
+				if e.button == 1:
+					self.shoot()
+			elif e.type == pygame.KEYDOWN:
+				if e.key == pygame.K_SPACE:
+					self.shoot()
 		
 		keys = pygame.key.get_pressed()
-		if keys[pygame.K_RIGHT] and self.mPos[0] < width:
+		if (keys[pygame.K_RIGHT] or keys[pygame.K_d]) and self.mPos[0] < width:
 			self.accel(self.accelSpd,dt)
 			
-		if keys[pygame.K_LEFT] and self.mPos[0] > 0:
+		if (keys[pygame.K_LEFT] or keys[pygame.K_a]) and self.mPos[0] > 0:
 			self.accel(-self.accelSpd,dt)
-
-		if keys[pygame.K_SPACE]:
-			pass
-			#shoot()
-			
+	
+	def render(self,dt):
+		tmp = self.rotate()
+		screen.blit(tmp, self.mPos.iTuple())
+		screen.blit(self.img, self.mPos.iTuple())
+		
 	def applyFriction(self):
 		if self.mVel[0] > 0:
 			self.mVel -= self.friction
@@ -81,28 +90,10 @@ class cannon(obj_Physics):
 			self.mVel += self.friction
 			if self.mVel[0] > 0:
 				self.mVel[0] = 0
-	
-	def render(self,dt):
-		screen.blit(self.img, self.mPos.iTuple())
 		
-	#def shoot(self):
-	#	tmpV = self.mPos + 
-	#	projectiles.append(cannonBall(
-		
-class barrel(cannon):
-	def __init__(self, x, y, Vx, Vy):
-		super().__init__(x,y,Vx,Vy)
-		self.offset = math3d.VectorN((0,0))
-		self.img = pygame.image.load("images/barrell.png")
-		self.angle = 0
-
-	def update(self,dt):
-		super().update(dt)
-		pygame.transform.rotate(self.img,self.getAngle())
-	
-	def render(self,dt):
-		print(self.getAngle())
-		screen.blit(self.img, self.mPos.iTuple())
+	def shoot(self):
+		tmpV = self.mPos + math3d.VectorN((0,0))
+		self.projectiles.append(cannonBall(tmpV.iTuple(), (random.uniform(50,350)*0.01,0)))
 
 	def getMousePos(self):
 		return pygame.mouse.get_pos()             #Returns in a tuple
@@ -112,11 +103,18 @@ class barrel(cannon):
 		newV = mouseV - self.mPos
 		angle = math.atan2(newV.mData[0], newV.mData[1])
 		angle = angle * (180/math.pi)
-		#if angle > 45:
-		#	angle = 45
-		#elif angle < 0:
-		#	angle = 0
+		angle = (angle+270) % 360
+		if angle > 45 and angle <= 180:
+			angle = 45
+		elif angle > 180:
+			angle = 0
 		return angle
+		
+	def rotate(self):
+		pos = self.barrelImg.get_rect().center
+		rot = pygame.transform.rotate(self.barrelImg, self.getAngle())
+		rot.get_rect().center = pos
+		return rot
 
 #====================Game==================
 
@@ -128,15 +126,14 @@ done = False
 
 screen = pygame.display.set_mode(size)
 
-objects = []
-objects.append(barrel(400,300,0,0))
-objects.append(cannon(400,300,0,0))
+C = cannon((400,300),(0,0))
 
 while not done:
 	#Update
 	dt = clock.tick(60) #This is in milliseconds
-	for obj in objects:
-		obj.update(dt)
+	C.update(dt)
+	for ball in C.projectiles:
+		ball.update(dt)
 	
 	#Inputs
 	eList = pygame.event.get()
@@ -151,8 +148,9 @@ while not done:
 	#Draw
 	bgColor = 0, 0, 0
 	screen.fill(bgColor)
-	for obj in objects:
-		obj.render(dt)
+	C.render(dt)
+	for ball in C.projectiles:
+		ball.render(dt)
 		
 	pygame.display.flip()
 	
