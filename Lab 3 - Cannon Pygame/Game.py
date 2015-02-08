@@ -28,13 +28,13 @@ class cannonBall(obj_Physics):
 	def __init__(self, pos, vel):
 		super().__init__(pos,vel)
 		self.img = pygame.image.load("images/coconut.png").convert()
-		self.gravity = math3d.VectorN((0,.05))
+		self.gravity = math3d.VectorN((0,.01))
 		self.rotation = 0
 	
 	def update(self, dt):
 		super().update(dt)
 		self.rotation += 5
-		self.mPos += self.gravity*dt
+		self.mVel += self.gravity
 	
 	def render(self, dt):
 		tmp = pygame.transform.rotate(self.img, self.rotation)
@@ -46,6 +46,7 @@ class cannon(obj_Physics):
 		super().__init__(pos,vel)
 		self.img = pygame.image.load("images/cannon.png")
 		self.barrelImg = pygame.image.load("images/barrell.png")
+		self.barrelRect = self.barrelImg.get_rect()
 		self.angle = 0
 		self.friction = math3d.VectorN((.1,0))
 		self.accelSpd = .01	
@@ -92,8 +93,11 @@ class cannon(obj_Physics):
 				self.mVel[0] = 0
 		
 	def shoot(self):
-		tmpV = self.mPos + math3d.VectorN((0,0))
-		self.projectiles.append(cannonBall(tmpV.iTuple(), (random.uniform(50,350)*0.01,0)))
+		tmpM = math3d.VectorN(self.getMousePos())
+		velV = tmpM - self.mPos
+		velV = velV.normalized_copy() * random.uniform(50,350)/100
+		print(velV.iTuple())
+		self.projectiles.append(cannonBall(self.mPos.iTuple(), velV.iTuple()))
 
 	def getMousePos(self):
 		return pygame.mouse.get_pos()             #Returns in a tuple
@@ -111,10 +115,8 @@ class cannon(obj_Physics):
 		return angle
 		
 	def rotate(self):
-		pos = self.barrelImg.get_rect().center
-		rot = pygame.transform.rotate(self.barrelImg, self.getAngle())
-		rot.get_rect().center = pos
-		return rot
+		rotImg = pygame.transform.rotate(self.barrelImg, self.getAngle())
+		return rotImg
 
 #====================Game==================
 
