@@ -90,15 +90,20 @@ class threads{
 	}
 	
 	public static File[] getFiles(String pattern){
-		File dir = new File(System.getProperty("user.dir"));
+		File dir = new File(".");
 		File[] files = dir.listFiles();
 		File[] temp = new File[files.length];
 		int index = 0;
 		for(File file: files){
 			String filename = file.getName();
-			if(String.format(pattern, index).equals(filename)){
-				temp[index] = file;
-				index++;
+			int tmp = 0;
+			while(tmp < files.length){
+				if(String.format(pattern, tmp).equals(filename)){
+					temp[index] = file;
+					index++;
+					break;
+				} else
+					tmp++;
 			}
 		}
 		File[] images = new File[index];
