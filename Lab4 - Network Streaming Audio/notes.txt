@@ -1,0 +1,41 @@
+Networking & Comms. Lab 4 notes
+
+import javax.sound.sampled.*;
+AudioFormat dfmt = new AudioFormat( rate, bytespersampel*8, channels, is_signed, false);
+SourceDataLine speaker = AudioSystem.getSourceDataLine(dfmt);
+speaker.open(dfmt);
+speaker.start();
+byte[] data = ...;
+speaker.write( data, 0, data.length);
+
+import java.net.*;
+DatagramSocket s = new DatagramSocket();
+String msg = "foo";
+InetAddres ip = InetAddress.getByName("www.example.com");
+s.send( new DatagramPacket(msg.getBytes(),msg.length(), ip, port));
+
+DatagramPacket d = new DatagramPacket( new byte(65536), 65536);
+s.receive(d);
+
+byte[] baa = d.getData();
+String str = new String(baa);
+
+byte[] sheep = Arrays.copyOfRange(baa, 20, 25);
+// Sheep gets baa[20] up to baa[25], baa[25] not included 
+
+Lab 4 Instructions
+parameters
+
+password+station!(optional)
+password = gimmeh mah tunes
+
+no station param = lists all stations
+station = use that station
+
+no ! = server will send back data
+!    = server will not send back data
+
+arsenic.ssucet.org, port 55555
+(browser) arsenic.ssucet.org:55555
+
+*server gives things in JSON format besides the byte data
