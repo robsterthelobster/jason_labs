@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import javax.imageio.*;
 
+
 class threads{
 
 	static AtomicInteger numPix = new AtomicInteger(0);
@@ -94,16 +95,13 @@ class threads{
 		File[] files = dir.listFiles();
 		File[] temp = new File[files.length];
 		int index = 0;
-		for(File file: files){
-			String filename = file.getName();
-			int tmp = 0;
-			while(tmp < files.length){
-				if(String.format(pattern, tmp).equals(filename)){
-					temp[index] = file;
-					index++;
-					break;
-				} else
-					tmp++;
+		while(true){
+			String filename = String.format(pattern, index);
+			if(!(new File(filename).exists()))
+				break;
+			else{
+				temp[index] = new File(filename);
+				index++;
 			}
 		}
 		File[] images = new File[index];
