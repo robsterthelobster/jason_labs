@@ -2,7 +2,7 @@ import socket
 import os
 
 ip = ''
-port = 8080
+port = 8888
 size = 1024
 password = "meh"
 pwGood = None
@@ -30,6 +30,7 @@ while True:
 		print(str(a[0]) + " " + command)
 		
 		path = os.getcwd() + "\\public"
+		
 		if command == "list":
 			files = os.listdir(path)
 			filenames = ""
@@ -41,6 +42,8 @@ while True:
 			c.sendall(filenames.encode())
 				
 		elif command == "get":
+			tmpS = "[" + command + "] command recieved."
+			c.sendall(tmpS.encode())
 			data = c.recv(size)
 			filename = data.decode()
 			try:
@@ -57,6 +60,8 @@ while True:
 				c.sendall("false".encode())
 				
 		elif command == "put":
+			tmpS = "[" + command + "] command recieved."
+			c.sendall(tmpS.encode()) 
 			data = c.recv(size)
 			filename = data.decode()
 			with open(path+"\\"+filename, 'wb') as file_to_write:
@@ -67,6 +72,8 @@ while True:
 					file_to_write.write(data)
 			
 		elif command == "delete":
+			tmpS = "[" + command + "] command recieved."
+			c.sendall(tmpS.encode())
 			data = c.recv(size)
 			try:
 				os.remove(path + "\\" + data.decode())
