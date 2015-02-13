@@ -63,12 +63,16 @@ class cannon(obj_Physics):
 
 	def __init__(self,pos,vel):
 		super().__init__(pos,vel)
+		#Cannon Base
 		self.img = pygame.image.load("images/cannon.png").convert_alpha()
 		self.imgRect = self.img.get_rect()
 		self.width = self.imgRect[0]
+		#Cannon Barrel
+		self.barrelOffset = math3d.VectorN((75,12))
 		self.barrelImg = pygame.image.load("images/barrell.png").convert_alpha()
 		self.barrelRect = self.barrelImg.get_rect()
 		self.angle = 0
+		#Other
 		self.accelSpd = width
 		self.projectiles = []
 	
@@ -90,6 +94,8 @@ class cannon(obj_Physics):
 			elif e.type == pygame.KEYDOWN:
 				if e.key == pygame.K_SPACE:
 					self.shoot()
+			elif e.type == pygame.QUIT:
+				return True
 		
 		keys = pygame.key.get_pressed()
 		if (keys[pygame.K_RIGHT] or keys[pygame.K_d]):
@@ -106,13 +112,13 @@ class cannon(obj_Physics):
 			self.mPos[0] = width-self.barrelRect[2]-1
 			self.mVel[0] = 0
 		
+		return False
 	def render(self,dt):
 		"""Rotates barrelImg first, then draws barrel and finally draws cannon base"""
 		tmp = self.rotate()
 		tmpRect = tmp.get_rect()
-		bWidth = int(tmpRect[2]/2)
-		bHeight = int(tmpRect[3]/2)
-		screen.blit(tmp, (self.mPos[0]+75-bWidth, self.mPos[1]+12-bHeight))
+		tmpVector = self.barrelOffset - math3d.VectorN((tmpRect[2],tmpRect[3]))/2
+		screen.blit(tmp, (self.mPos + tmpVector).iTuple())
 		screen.blit(self.img, self.mPos.iTuple())
 		
 	def shoot(self):
@@ -122,11 +128,12 @@ class cannon(obj_Physics):
 		angle = math.radians(self.getAngle())
 		cY = math.sin(angle) * self.barrelRect[2]/2
 		cX = math.cos(angle) * self.barrelRect[2]/2
-		offset = math3d.VectorN((cX+75,-cY+12))
+		offset = math3d.VectorN((cX,-cY)) + self.barrelOffset
 		finalPos = self.mPos + offset
 		#velocity
 		velV = finalPos - self.mPos
-		velV = velV.normalized_copy() * random.uniform(50,350)
+		velV = velV.normalized_copy() * random.uniform(350,700)
+		#velV = math3d.VectorN((random.uniform(50,350),-random.uniform(50,350)))
 		self.projectiles.append(cannonBall((finalPos[0],finalPos[1]), velV.iTuple()))
 
 	def getMousePos(self):
@@ -163,15 +170,10 @@ C = cannon((width/2,height*.7),(0,0))
 while not done:
 	#Update
 	dt = clock.tick()/1000
-	C.update(dt)
+	done = C.update(dt)
+		
 	for ball in C.projectiles:
 		ball.update(dt)
-	
-	#Inputs
-	eList = pygame.event.get()
-	for e in eList:
-		if e.type == pygame.QUIT:
-			done = True
 		
 	keys = pygame.key.get_pressed()
 	if keys[pygame.K_ESCAPE]:

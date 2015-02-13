@@ -111,7 +111,7 @@ class VectorN(object):
 			newVector = VectorN(tempList)
 			return newVector
 		else:
-			raise TypeError("You can only multiply this Vector by a scalar")
+			raise TypeError(str(num) + " is not a scalar! You can only multiply this Vector by a scalar")
 			return NotImplemented                      #If self*num format fails, tries num*self by using __rmul__
 		
 	def __rmul__(self, num):
@@ -122,15 +122,15 @@ class VectorN(object):
 	def __truediv__(self, num):
 		"""Divide this vector by the passed num
 		   Format: self / num"""
-		if isinstance(num, (int, float)):
+		if isinstance(num, (int, float)) and num != 0:
 			return self * (1/num)
 		else:
-			raise TypeError("You can only divide this Vector by a scalar")
+			raise TypeError(str(num) + " is not a scalar! You can only divide this Vector by a scalar")
 			return NotImplemented                      #If self/num format fails, goes to __rtruediv___
 			
 	def __rtruediv__(self, num):
 		"""Since you cannot divide anything by a VectorN, this just displays a error"""
-		raise NotImplementedError("You cannot divide anything by a VectorN")
+		raise NotImplementedError("You cannot divide " + str(num) + " by a VectorN")
 			
 	def __neg__(self):
 		"""Returns a vector with the negative values of this vector"""
@@ -148,7 +148,7 @@ class VectorN(object):
 		return True
 		
 	def magnitude(self):
-		"""Returns the magnitude of this vector using pythagorean theorem"""
+		"""Returns the magnitude of this vector using Pythagorean theorem"""
 		tempValue = 0
 		for i in self.mData:
 			tempValue += math.pow(i,2)
