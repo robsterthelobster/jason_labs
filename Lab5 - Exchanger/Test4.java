@@ -14,15 +14,15 @@ public class Test4{
             
             int y=this.x;
             
-            try{
-                while( Test4.keepgoing.get() ){
-                    y = (Integer) Test4.ex.exchange(new Integer(y));
-                }
-                this.y = y;
+            //try{
+            while( Test4.keepgoing.get() ){
+                y = (Integer) Test4.ex.exchange(new Integer(y));
             }
-            catch(InterruptedException e){
-                System.exit(1);
-            }
+            this.y = y;
+            //}
+            //catch(InterruptedException e){
+            //    System.exit(1);
+            //}
         }
     }
 
@@ -32,11 +32,11 @@ public class Test4{
             this.x=x;
         }
         public void run(){
-            try{
-                x=(Integer)Test4.ex.exchange(new Integer(x));
-            } catch(InterruptedException e){
-                System.exit(0);
-            }
+            //try{
+            x=(Integer)Test4.ex.exchange(new Integer(x));
+            //} catch(InterruptedException e){
+            //    System.exit(0);
+            //}
         }
     }
 
@@ -91,8 +91,8 @@ public class Test4{
         }
         
         //uncomment to see content of arrays
-        //System.out.println(expected);
-        //System.out.println(actual);
+        System.out.println(expected);
+        System.out.println(actual);
         
         Assert.Assert(expected.equals(actual));
         

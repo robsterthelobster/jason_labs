@@ -7,21 +7,21 @@ public class Test2{
         Ob(){
         }
         public void run(){
+            //try{
+            Random r = new Random();
+            this.x = r.nextInt();
             try{
-                Random r = new Random();
-                this.x = r.nextInt();
-                try{
-                    Thread.sleep(r.nextInt(1000));
-                } catch(InterruptedException e){
-                    System.exit(1);
-                }
-                
-                int y = (Integer) Test2.ex.exchange(new Integer(x));
-                this.y=y;
-            }
-            catch(InterruptedException e){
+                Thread.sleep(r.nextInt(1000));
+            } catch(InterruptedException e){
                 System.exit(1);
             }
+            
+            int y = (Integer) Test2.ex.exchange(new Integer(x));
+            this.y=y;
+            //}
+            //catch(InterruptedException e){
+            //    System.exit(1);
+            //}
         }
     }
 

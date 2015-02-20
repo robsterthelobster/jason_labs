@@ -14,11 +14,11 @@ class Test3{
             int y=this.x;
             
             try{
-                while( Test3.keepgoing.get() ){
-                    Thread.sleep(r.nextInt(100));
-                    y = (Integer) Test3.ex.exchange(new Integer(y));
-                }
-                this.y = y;
+				while( Test3.keepgoing.get() ){
+					Thread.sleep(r.nextInt(100));
+					y = (Integer) Test3.ex.exchange(new Integer(y));
+				}
+				this.y = y;
             }
             catch(InterruptedException e){
                 System.exit(1);
@@ -32,11 +32,11 @@ class Test3{
             this.x=x;
         }
         public void run(){
-            try{
-                Test3.ex.exchange(new Integer(x));
-            } catch(InterruptedException e){
-                System.exit(0);
-            }
+            //try{
+            Test3.ex.exchange(new Integer(x));
+            //} catch(InterruptedException e){
+            //    System.exit(0);
+            //}
         }
     }
 
@@ -90,8 +90,8 @@ class Test3{
         }
         
         //uncomment to see content of arrays
-        //System.out.println(expected);
-        //System.out.println(actual);
+        System.out.println(expected);
+        System.out.println(actual);
         
         Assert.Assert(expected.equals(actual));
         
