@@ -1,5 +1,7 @@
 Networking & Comms. Lab 4 notes
 
+
+
 import javax.sound.sampled.*;
 AudioFormat dfmt = new AudioFormat( rate, bytespersampel*8, channels, is_signed, false);
 SourceDataLine speaker = AudioSystem.getSourceDataLine(dfmt);
@@ -39,3 +41,5 @@ arsenic.ssucet.org, port 55555
 (browser) arsenic.ssucet.org:55555
 
 *server gives things in JSON format besides the byte data
+
+*name of server, port, sation
