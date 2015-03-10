@@ -4,6 +4,7 @@ import java.io.*;
 import javax.imageio.*;
 import java.awt.image.BufferedImage;
 import java.awt.Color;
+import java.util.concurrent.locks.*;
 
 class blur{
 
@@ -13,6 +14,8 @@ class blur{
 	static int blurLength = 25;
 	static BufferedImage img;
 	static BufferedImage tmpImg;
+	static Lock L = new ReentrantLock();
+	static int currentTotalPixels = 0;
 
 	public static void main(String[] args){
 		String pattern = "";
@@ -55,6 +58,7 @@ class blur{
 			try{
 				img = ImageIO.read(file);
 				tmpImg = new BufferedImage(img.getWidth(),img.getHeight(),img.getType());
+				currentTotalPixels = img.getWidth() * img.getHeight();
 			} catch(IOException e){
 				System.out.println(e);
 			}
@@ -97,17 +101,22 @@ class blur{
 	
 	public static class iThread extends Thread{
 		int index, passes, blurSize, start, end, imgWidth;
+		static int percent = 0;
+		static int oldP = 0;
+		static int count = 0;
 		
 		public iThread(int index, int threads, int passes, int blurSize){
 			this.index = index;
 			this.passes = passes;
 			this.blurSize = blurSize;
+			//try{
+			//	L.lock();
 			this.imgWidth = img.getWidth();
-			
 			this.start = index * img.getHeight()/threads;
-			//if(index != 0)
-			//	this.start += 1;
 			this.end   = (index+1) * img.getHeight()/threads;
+			//} finally{
+			//	L.unlock();
+			//}
 		}
 		
 		public void run(){
@@ -145,13 +154,17 @@ class blur{
 					int tmpR = 0;
 					int tmpG = 0;
 					int tmpB = 0;
+					int RGB = 0;
 					//For loops to get 25x25 px area
 					for(int r = rStart; r < rEnd; r++){
 						for(int c = cStart; c < cEnd; c++){
 							//Grab RGB values
-							//Lock?
-							int RGB = img.getRGB(c,r);
-							//Unlock?
+							//try{
+							//	L.lock();
+							RGB = img.getRGB(c,r);
+							//} finally{
+							//	L.unlock();
+							//}
 							tmpR +=((0x00ff0000 & RGB) >> 16);
 							tmpG +=((0x0000ff00 & RGB) >> 8);
 							tmpB +=((0x000000ff & RGB));
@@ -161,9 +174,24 @@ class blur{
 					tmpG = tmpG/pixels;
 					tmpB = tmpB/pixels;
 					//Set RGB value to new image
-					//Lock?
-					tmpImg.setRGB(x, y, new Color(tmpR,tmpG,tmpB).getRGB());
-					//Unlock?
+					try{
+						L.lock();
+						tmpImg.setRGB(x, y, new Color(tmpR,tmpG,tmpB).getRGB());
+						count++;
+						percent = count*100/currentTotalPixels;
+						
+						if(percent > oldP){
+							System.out.format("%7d"+"/"+"%7d pixels left... %3d%% done\n",count,currentTotalPixels,percent);
+							oldP = percent;
+						}
+						if(percent == 100){
+							count = 0;
+							oldP = 0;
+						}
+						
+					} finally{
+						L.unlock();
+					}
 				}
 			}
 		}
