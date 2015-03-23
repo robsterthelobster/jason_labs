@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset=utf8>
+        <link rel=stylesheet href="/public/jquery-ui/jquery-ui.css">
+        <!--
+        if you downloaded the jquery-ui themes package, you can choose one like so:
+        <link rel=stylesheet href="/public/jquery-ui-themes/swanky-purse/jquery-ui.css">
+        -->
+        <script src="/public/jquery.js"></script>
+        <script src="/public/jquery-ui/jquery-ui.js"></script>
+    </head>
+<body>
+If jQueryUI is working,  this <button id="showdialog">button</button>
+should do something.
+
+
+
+<div id="mydialog" style="display:none">
+<label>Username<input size=20></label><br>
+<label>Password<input size=20 type=password></label><br>
+<label><input type=checkbox checked>Spam Me, Please!</label><br>
+</div>
+
+
+<script>
+$("#mydialog").dialog({ 
+            autoOpen: false,
+            height: 300,
+            width: 400,
+            modal: true,
+            title: "Don't click create!",
+            buttons: {
+                "Create My Account" : function(){ 
+                    $(document.body).html("BWAHAHA");
+                },
+                "Cancel": function(){ 
+                    $(this).dialog("close");
+                }
+            }
+});
+$("#showdialog").click(function(){ $("#mydialog").dialog("open") });
+
+</script>

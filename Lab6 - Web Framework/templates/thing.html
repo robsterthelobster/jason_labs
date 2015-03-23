@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <charset=utf8>
+</head>
+<body>
+
+<%include file="header.html"/>
+
+## double pound signs give comments
+
+##${ } can be used to output an arbitrary Python expression.
+##If the contents are not a string, they get cast to one.
+
+Hello, ${friend}.
+
+<%doc>
+This is a big multiline comment.
+More stuff goes here.
+This will not be seen in the output.
+</%doc>
+
+
+<br>
+I could repeat your name twice: ${friend+" "+friend}.<br>
+<br>
+
+%if len(people) == 0:
+We have no people to list!
+%elif len(people) == 1:
+Only one person: ${people[0]}
+%else:
+We have these people:<br>
+<ul>
+%for p in people:
+    <li>${p}</li>
+%endfor
+</ul>
+%endif
+
+
+##Can have a block of Python code
+
+<%
+f=[]
+for x in people2:
+    f.append(x.split(" ")[0])
+%>
+
+Here is another list: <ol>
+%for p in f:
+    <li>${p}</li>
+%endfor
+</ol>
+
+##We can also write content programmatically:
+
+<%
+for i in range(10):
+    context.write(str(i)+" ")
+%>
+
+<%include file="footer.html" />
+
+</body>
+</html>
